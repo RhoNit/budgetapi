@@ -17,10 +17,8 @@ func (h *Handler) RegisterUserHandler(c echo.Context) error {
 	request := new(requests.RegisterUserRequest)
 
 	// bind the request body
-	if err := (&echo.DefaultBinder{}).BindBody(c, request); err != nil {
-		h.Logger.Error(err)
+	if err := h.BindRequestBody(c, request); err != nil {
 		return common.SendBadRequestResponse(c, err.Error())
-
 	}
 
 	// var validate *validator.Validate
@@ -74,8 +72,7 @@ func (h *Handler) RegisterUserHandler(c echo.Context) error {
 func (h *Handler) LoginUserHandler(c echo.Context) error {
 	request := new(requests.LoginUserRequest)
 	// bind payload with golang-struct type
-	if err := (&echo.DefaultBinder{}).BindBody(c, request); err != nil {
-		h.Logger.Error(err)
+	if err := h.BindRequestBody(c, request); err != nil {
 		return common.SendBadRequestResponse(c, err.Error())
 	}
 
