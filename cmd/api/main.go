@@ -16,9 +16,10 @@ import (
 )
 
 type Application struct {
-	logger  echo.Logger
-	server  *echo.Echo
-	handler handlers.Handler
+	logger        echo.Logger
+	server        *echo.Echo
+	handler       handlers.Handler
+	appMiddleware middlewares.AppMiddleware
 }
 
 func main() {
@@ -44,16 +45,22 @@ func main() {
 		Mailer: appMailer,
 	}
 
+	appMiddleware := middlewares.AppMiddleware{
+		Logger: e.Logger,
+		DB:     db,
+	}
+
 	app := Application{
-		logger:  e.Logger,
-		server:  e,
-		handler: h,
+		logger:        e.Logger,
+		server:        e,
+		handler:       h,
+		appMiddleware: appMiddleware,
 	}
 
 	app.server.Use(middleware.Logger())
-	app.server.Use(middlewares.CustomMiddleware)
+	// app.server.Use(middlewares.CustomMiddleware)
 
-	routes.Endpoints(app.server, h)
+	routes.Endpoints(app.server, app.handler, app.appMiddleware)
 
 	port := os.Getenv("SERVER_PORT")
 	addr := fmt.Sprintf("127.0.0.1:%s", port)
