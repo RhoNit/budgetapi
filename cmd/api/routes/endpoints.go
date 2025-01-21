@@ -12,5 +12,6 @@ func Endpoints(engine *echo.Echo, handler handlers.Handler) {
 		return c.String(http.StatusOK, "Budget API's `Hello World` page")
 	})
 	engine.GET("/health", handler.HealthCheck)
-	engine.POST("/register", handler.RegisterUser)
+	engine.POST("/register", handler.RegisterUserHandler)
+	engine.POST("/login", handler.LoginUserHandler)
 }
