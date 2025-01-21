@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/RhoNit/budgetapi/cmd/api/requests"
 	"github.com/RhoNit/budgetapi/cmd/api/services"
 	"github.com/RhoNit/budgetapi/common"
 	"github.com/RhoNit/budgetapi/internal/mailer"
+	"github.com/RhoNit/budgetapi/internal/models"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -110,4 +112,13 @@ func (h *Handler) LoginUserHandler(c echo.Context) error {
 		"refresh_token": refreshToken,
 		"user":          retrievedUser,
 	})
+}
+
+func (h *Handler) GetAuthenticatedUser(c echo.Context) error {
+	user, ok := c.Get("user").(models.User)
+	fmt.Println(user)
+	if !ok {
+		return common.SendInternalServerErrorResponse(c, "user authentication failed")
+	}
+	return common.SendSuccessResponse(c, "Authenticated user", user)
 }
