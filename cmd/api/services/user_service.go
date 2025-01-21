@@ -40,6 +40,12 @@ func (u *UserService) RegisterUser(userRequest *requests.RegisterUserRequest) (*
 	return &user, nil
 }
 
+func (u *UserService) LoginUser(userRequest *requests.LoginUserRequest) error {
+	// compare the request-body password with hashed one in the DB
+
+	return nil
+}
+
 func (u *UserService) GetUserByEmail(email string) (*models.User, error) {
 	var user *models.User
 	result := u.db.Where("email = ?", email).First(&user)
