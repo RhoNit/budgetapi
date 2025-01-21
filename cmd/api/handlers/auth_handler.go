@@ -11,12 +11,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func (h *Handler) RegisterUser(c echo.Context) error {
+func (h *Handler) RegisterUserHandler(c echo.Context) error {
 	request := new(requests.RegisterUserRequest)
 
 	// bind the request body
 	if err := (&echo.DefaultBinder{}).BindBody(c, request); err != nil {
-		c.Logger().Error(err)
+		h.Logger.Error(err)
 		return common.SendBadRequestResponse(c, err.Error())
 
 	}
@@ -26,7 +26,7 @@ func (h *Handler) RegisterUser(c echo.Context) error {
 	validationErrors := h.ValidateRequestBody(c, *request)
 
 	if validationErrors != nil {
-		c.Logger().Error(validationErrors)
+		h.Logger.Error(validationErrors)
 		return common.SendFailedValidationResponse(c, validationErrors)
 	}
 
@@ -67,4 +67,47 @@ func (h *Handler) RegisterUser(c echo.Context) error {
 	// c.Logger().Info(request)
 
 	return common.SendSuccessResponse(c, "User Registration successful!", registeredUser)
+}
+
+func (h *Handler) LoginUserHandler(c echo.Context) error {
+	request := new(requests.LoginUserRequest)
+	// bind payload with golang-struct type
+	if err := (&echo.DefaultBinder{}).BindBody(c, request); err != nil {
+		h.Logger.Error(err)
+		return common.SendBadRequestResponse(c, err.Error())
+	}
+
+	// check validation of request body i.e. payload
+	validationErrors := h.ValidateRequestBody(c, *request)
+
+	if validationErrors != nil {
+		h.Logger.Error(validationErrors)
+		return common.SendFailedValidationResponse(c, validationErrors)
+	}
+
+	// verify user email id already exists or not
+	userService := services.NewUserService(h.DB)
+	retrievedUser, err := userService.GetUserByEmail(request.Email)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		h.Logger.Error(err)
+		return common.SendBadRequestResponse(c, "Invalid email or password")
+	}
+
+	// compare password hash with plain password
+	result := common.CheckPasswordHash(request.Password, retrievedUser.HashedPassword)
+	if !result {
+		return common.SendBadRequestResponse(c, "Invalid email or password")
+	}
+
+	// send response with access token
+	accessToken, refreshToken, err := common.GenerateJWTTokens(retrievedUser)
+	if err != nil {
+		h.Logger.Error(err)
+		return common.SendInternalServerErrorResponse(c, err.Error())
+	}
+	return common.SendSuccessResponse(c, "user login successful", map[string]interface{}{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+		"user":          retrievedUser,
+	})
 }
