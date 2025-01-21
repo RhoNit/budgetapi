@@ -22,6 +22,11 @@ func Endpoints(engine *echo.Echo, handler handlers.Handler, mw middlewares.AppMi
 		profileRoutes.GET("/authenticated-user", handler.GetAuthenticatedUser, mw.AuthMiddleware)
 	}
 
+	categoryRoutes := appRoute.Group("/categories", mw.AuthMiddleware)
+	{
+		categoryRoutes.GET("/all", handler.ListCategoriesHandler)
+	}
+
 	engine.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Budget API's `Hello World` page")
 	})
