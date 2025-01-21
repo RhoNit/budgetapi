@@ -59,3 +59,7 @@ func SendInternalServerErrorResponse(c echo.Context, msg string) error {
 func SendNotFoundResponse(c echo.Context, msg string) error {
 	return SendErrorResponse(c, msg, http.StatusNotFound)
 }
+
+func SendUnauthorizedResponse(c echo.Context, msg string) error {
+	return SendErrorResponse(c, msg, http.StatusUnauthorized)
+}
