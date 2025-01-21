@@ -1,7 +1,6 @@
 package common
 
 import (
-	"errors"
 	"os"
 	"time"
 
@@ -57,10 +56,22 @@ func ParseJWTSignedAccessToken(signedAccessToken string) (*CustomJWTClaims, erro
 	})
 
 	if err != nil {
+		// log.Error(err)
 		return nil, err
-	} else if claims, ok := parsedJWTAccessToken.Claims.(CustomJWTClaims); ok {
-		return &claims, nil
-	} else {
-		return nil, errors.New("unknown claim type, can't proceed")
 	}
+
+	claims, ok := parsedJWTAccessToken.Claims.(*CustomJWTClaims)
+	if ok {
+		return claims, nil
+	}
+	// } else {
+	// 	return nil, errors.New("unknown claim type, can't proceed")
+	// }
+	return nil, err
+}
+
+func IsClaimExpired(claims *CustomJWTClaims) bool {
+	currentTime := jwt.NewNumericDate(time.Now())
+
+	return claims.ExpiresAt.Time.Before(currentTime.Time)
 }
