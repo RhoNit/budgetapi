@@ -24,7 +24,8 @@ func main() {
 
 	for _, category := range categories {
 		_, err = catSvc.CreateCategory(&requests.CategoryRequest{
-			Name: category,
+			Name:     category,
+			IsCustom: false,
 		})
 
 		if err != nil {
