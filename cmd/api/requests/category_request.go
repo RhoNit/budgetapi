@@ -1,5 +1,6 @@
 package requests
 
 type CategoryRequest struct {
-	Name string `json:"name"`
+	Name     string `json:"name" validate:"required"`
+	IsCustom bool   `default:"false" json:"is_custom"`
 }
