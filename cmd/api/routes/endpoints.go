@@ -24,7 +24,9 @@ func Endpoints(engine *echo.Echo, handler handlers.Handler, mw middlewares.AppMi
 
 	categoryRoutes := appRoute.Group("/categories", mw.AuthMiddleware)
 	{
+		categoryRoutes.POST("/create", handler.CreateCategoryHandler)
 		categoryRoutes.GET("/all", handler.ListCategoriesHandler)
+		categoryRoutes.DELETE("/delete/:id", handler.DeleteCategoryHandler)
 	}
 
 	engine.GET("/", func(c echo.Context) error {
