@@ -40,14 +40,17 @@ func (h *Handler) CreateCategoryHandler(c echo.Context) error {
 }
 
 func (h *Handler) ListCategoriesHandler(c echo.Context) error {
+	var categories []*models.Category
+	paginator := common.NewPaginator(categories, c.Request(), h.DB)
+
 	categoryService := services.NewCategoryService(h.DB)
-	retrievedCategories, err := categoryService.ListCategories()
+	paginatedCategories, err := categoryService.ListCategories(paginator, categories)
 
 	if err != nil {
 		return common.SendInternalServerErrorResponse(c, err.Error())
 	}
 
-	return common.SendSuccessResponse(c, "categories retrieved", retrievedCategories)
+	return common.SendSuccessResponse(c, "categories retrieved", paginatedCategories)
 }
 
 func (h *Handler) DeleteCategoryHandler(c echo.Context) error {

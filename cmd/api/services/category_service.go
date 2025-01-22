@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/RhoNit/budgetapi/cmd/api/requests"
+	"github.com/RhoNit/budgetapi/common"
 	"github.com/RhoNit/budgetapi/common/custom_errors"
 	"github.com/RhoNit/budgetapi/internal/models"
 	"gorm.io/gorm"
@@ -21,15 +22,14 @@ func NewCategoryService(db *gorm.DB) *CategoryService {
 	}
 }
 
-func (c *CategoryService) ListCategories() ([]*models.Category, error) {
-	var categories []*models.Category
+func (c *CategoryService) ListCategories(paginator *common.Pagination, categories []*models.Category) (*common.Pagination, error) {
+	c.Database.Scopes(paginator.Paginate()).Find(&categories)
+	paginator.Items = categories
+	// if result.Error != nil {
+	// 	return nil, errors.New("failed to fetch categories")
+	// }
 
-	result := c.Database.Find(&categories)
-	if result.Error != nil {
-		return nil, errors.New("failed to fetch categories")
-	}
-
-	return categories, nil
+	return paginator, nil
 }
 
 func (c *CategoryService) CreateCategory(categoryRequest *requests.CategoryRequest) (*models.Category, error) {
