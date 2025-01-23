@@ -12,6 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// Category handlers (not any user specific)
 func (h *Handler) CreateCategoryHandler(c echo.Context) error {
 	_, ok := c.Get("user").(models.User)
 	if !ok {
@@ -81,6 +82,7 @@ func (h *Handler) DeleteCategoryHandler(c echo.Context) error {
 	return common.SendSuccessResponse(c, "category deleted", nil)
 }
 
+// User-Category Association handlers
 func (h *Handler) AssociateUserToCategoriesHandler(c echo.Context) error {
 	user, ok := c.Get("user").(models.User)
 	if !ok {
@@ -137,4 +139,42 @@ func (h *Handler) ListAssociatedUserCategoriesHandler(c echo.Context) error {
 	}
 
 	return common.SendSuccessResponse(c, fmt.Sprintf("categories retrieved for user: %d | %s", user.ID, user.Email), paginatedCategories)
+}
+
+func (h *Handler) CreateCustomUserCategoryHandler(c echo.Context) error {
+	user, ok := c.Get("user").(models.User)
+	if !ok {
+		return common.SendInternalServerErrorResponse(c, "User authentication failed")
+	}
+
+	// bind the payload body
+	request := new(requests.CategoryRequest)
+	if err := h.BindRequestBody(c, request); err != nil {
+		return common.SendBadRequestResponse(c, "failed to bind category request body")
+	}
+
+	// validation
+	validationErrors := h.ValidateRequestBody(c, *request)
+	if validationErrors != nil {
+		return common.SendFailedValidationResponse(c, validationErrors)
+	}
+
+	// create category
+	categoryServices := services.NewCategoryService(h.DB)
+	category, err := categoryServices.CreateCategory(request)
+	if err != nil {
+		return common.SendInternalServerErrorResponse(c, err.Error())
+	}
+
+	// append that created category to the list
+	var listOfCategories []*models.Category
+	listOfCategories = append(listOfCategories, category)
+
+	// associate the user with the above the list of categories
+	err = categoryServices.AssociateUserToCategories(&user, listOfCategories)
+	if err != nil {
+		return common.SendInternalServerErrorResponse(c, err.Error())
+	}
+
+	return common.SendSuccessResponse(c, "custom category created", category)
 }
