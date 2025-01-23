@@ -32,6 +32,7 @@ func Endpoints(engine *echo.Echo, handler handlers.Handler, mw middlewares.AppMi
 	associateUserToCategoriesRoutes := appRoute.Group("/users/categories", mw.AuthMiddleware)
 	{
 		associateUserToCategoriesRoutes.POST("/associate", handler.AssociateUserToCategoriesHandler)
+		associateUserToCategoriesRoutes.POST("/create", handler.CreateCustomUserCategoryHandler)
 		associateUserToCategoriesRoutes.GET("/all", handler.ListAssociatedUserCategoriesHandler)
 	}
 
