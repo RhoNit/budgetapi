@@ -36,6 +36,11 @@ func Endpoints(engine *echo.Echo, handler handlers.Handler, mw middlewares.AppMi
 		associateUserToCategoriesRoutes.GET("/all", handler.ListAssociatedUserCategoriesHandler)
 	}
 
+	budgetRoutes := appRoute.Group("/budgets", mw.AuthMiddleware)
+	{
+		budgetRoutes.POST("/create", handler.CreateBudgetHandler)
+	}
+
 	engine.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Budget API's `Hello World` page")
 	})
