@@ -6,7 +6,12 @@ import (
 )
 
 func MigrateDBUp(db *gorm.DB) {
-	err := db.AutoMigrate(&models.User{}, &models.Category{})
+	err := db.AutoMigrate(
+		&models.User{},
+		&models.Category{},
+		&models.UserCategory{},
+		&models.Budget{},
+	)
 	if err != nil {
 		panic(err)
 	}
