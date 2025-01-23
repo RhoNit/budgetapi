@@ -29,6 +29,12 @@ func Endpoints(engine *echo.Echo, handler handlers.Handler, mw middlewares.AppMi
 		categoryRoutes.DELETE("/delete/:id", handler.DeleteCategoryHandler)
 	}
 
+	associateUserToCategoriesRoutes := appRoute.Group("/users/categories", mw.AuthMiddleware)
+	{
+		associateUserToCategoriesRoutes.POST("/associate", handler.AssociateUserToCategoriesHandler)
+		associateUserToCategoriesRoutes.GET("/all", handler.ListAssociatedUserCategoriesHandler)
+	}
+
 	engine.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Budget API's `Hello World` page")
 	})
