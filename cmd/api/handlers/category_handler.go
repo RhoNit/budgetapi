@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/RhoNit/budgetapi/cmd/api/requests"
 	"github.com/RhoNit/budgetapi/cmd/api/services"
@@ -78,4 +79,62 @@ func (h *Handler) DeleteCategoryHandler(c echo.Context) error {
 	}
 
 	return common.SendSuccessResponse(c, "category deleted", nil)
+}
+
+func (h *Handler) AssociateUserToCategoriesHandler(c echo.Context) error {
+	user, ok := c.Get("user").(models.User)
+	if !ok {
+		return common.SendInternalServerErrorResponse(c, "User authentication failed")
+	}
+
+	// bind the payload body
+	request := new(requests.AssociateUserToCategoriesRequest)
+	if err := h.BindRequestBody(c, request); err != nil {
+		return common.SendBadRequestResponse(c, "failed to bind category request body")
+	}
+
+	// validation
+	validationErrors := h.ValidateRequestBody(c, *request)
+	if validationErrors != nil {
+		return common.SendFailedValidationResponse(c, validationErrors)
+	}
+
+	//
+	categoryServices := services.NewCategoryService(h.DB)
+	listOfCategories, err := categoryServices.GetMultipleCategories(request.CategoryIDs)
+	if err != nil {
+		return common.SendInternalServerErrorResponse(c, err.Error())
+	}
+	totalCategoriesCount := len(listOfCategories)
+
+	err = categoryServices.AssociateUserToCategories(&user, listOfCategories)
+	if err != nil {
+		return common.SendInternalServerErrorResponse(c, err.Error())
+	}
+
+	return common.SendSuccessResponse(c, fmt.Sprintf("%d categories are associated with user: %d | %s", totalCategoriesCount, user.ID, user.Email), nil)
+}
+
+func (h *Handler) ListAssociatedUserCategoriesHandler(c echo.Context) error {
+	user, ok := c.Get("user").(models.User)
+	if !ok {
+		return common.SendInternalServerErrorResponse(c, "User authentication failed")
+	}
+
+	var categories []*models.Category
+	// query := "SELECT * FROM categories
+	// 			INNER JOIN user_categories ON categories.id = user_categories.category_id
+	// 			WHERE user_categories.user_id = ?"
+	query := h.DB.Model(&models.Category{}).InnerJoins("INNER JOIN user_categories ON categories.id = user_categories.category_id").Where("user_categories.user_id = ?", user.ID)
+
+	categoryService := services.NewCategoryService(query)
+
+	paginator := common.NewPaginator(categories, c.Request(), h.DB)
+	paginatedCategories, err := categoryService.ListCategories(paginator, categories)
+
+	if err != nil {
+		return common.SendInternalServerErrorResponse(c, err.Error())
+	}
+
+	return common.SendSuccessResponse(c, fmt.Sprintf("categories retrieved for user: %d | %s", user.ID, user.Email), paginatedCategories)
 }

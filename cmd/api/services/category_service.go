@@ -10,6 +10,7 @@ import (
 	"github.com/RhoNit/budgetapi/common/custom_errors"
 	"github.com/RhoNit/budgetapi/internal/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CategoryService struct {
@@ -80,4 +81,33 @@ func (c *CategoryService) DeleteCategoryById(id uint) error {
 	c.Database.Delete(category)
 
 	return nil
+}
+
+func (c *CategoryService) AssociateUserToCategories(user *models.User, categories []*models.Category) error {
+	if user != nil && categories != nil && len(categories) > 0 {
+		var userCategories []*models.UserCategory
+
+		for _, category := range categories {
+			userCategories = append(userCategories, &models.UserCategory{
+				UserID:     user.ID,
+				CategoryID: category.ID,
+			})
+		}
+
+		result := c.Database.Clauses(clause.OnConflict{DoNothing: true}).Create(userCategories)
+		if result.Error != nil {
+			return result.Error
+		}
+	}
+
+	return nil
+}
+
+func (c *CategoryService) GetMultipleCategories(categoryIDs []uint) ([]*models.Category, error) {
+	var categories []*models.Category
+	result := c.Database.Where("id IN ?", categoryIDs).Find(&categories)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return categories, nil
 }
