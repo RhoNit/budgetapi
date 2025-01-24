@@ -39,6 +39,7 @@ func Endpoints(engine *echo.Echo, handler handlers.Handler, mw middlewares.AppMi
 	budgetRoutes := appRoute.Group("/budgets", mw.AuthMiddleware)
 	{
 		budgetRoutes.POST("/create", handler.CreateBudgetHandler)
+		budgetRoutes.GET("/all", handler.ListBudgetsHandler)
 	}
 
 	engine.GET("/", func(c echo.Context) error {
