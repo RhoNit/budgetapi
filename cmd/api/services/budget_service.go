@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/RhoNit/budgetapi/cmd/api/requests"
+	"github.com/RhoNit/budgetapi/common"
 	"github.com/RhoNit/budgetapi/internal/models"
 	"gorm.io/gorm"
 )
@@ -67,4 +68,11 @@ func (b *BudgetService) budgetExistsForYearMonthSlugAndUserID(userId uint, slug 
 	}
 
 	return retrievedBudget, nil
+}
+
+func (b *BudgetService) ListBudgets(query *gorm.DB, paginator *common.Pagination, budgets []*models.Budget) (*common.Pagination, error) {
+	query.Scopes(paginator.Paginate()).Find(&budgets)
+	paginator.Items = budgets
+
+	return paginator, nil
 }

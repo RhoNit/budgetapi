@@ -49,3 +49,24 @@ func (h *Handler) CreateBudgetHandler(c echo.Context) error {
 
 	return common.SendSuccessResponse(c, "budget created", budgetCreated)
 }
+
+func (h *Handler) ListBudgetsHandler(c echo.Context) error {
+	user, ok := c.Get("user").(models.User)
+	if !ok {
+		return common.SendInternalServerErrorResponse(c, "User authentication failed")
+	}
+
+	var budgets []*models.Budget
+
+	query := h.DB.Preload("Categories").Scopes(common.WhereUserIDScope(user.ID))
+	paginator := common.NewPaginator(budgets, c.Request(), query)
+
+	budgetService := services.NewBudgetService(h.DB)
+	paginatedBudgets, err := budgetService.ListBudgets(query, paginator, budgets)
+
+	if err != nil {
+		return common.SendInternalServerErrorResponse(c, err.Error())
+	}
+
+	return common.SendSuccessResponse(c, "budgets retrieved", paginatedBudgets)
+}
