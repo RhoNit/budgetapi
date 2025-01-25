@@ -30,7 +30,7 @@ func (h *Handler) CreateBudgetHandler(c echo.Context) error {
 	budgetCreated, err := budgetService.CreateBudget(request, user.ID)
 	if err != nil {
 		c.Logger().Error(err)
-		return common.SendInternalServerErrorResponse(c, "Budget could not be created")
+		return common.SendInternalServerErrorResponse(c, err.Error())
 	}
 
 	categoryService := services.NewCategoryService(h.DB)
@@ -70,3 +70,46 @@ func (h *Handler) ListBudgetsHandler(c echo.Context) error {
 
 	return common.SendSuccessResponse(c, "budgets retrieved", paginatedBudgets)
 }
+
+// func (h *Handler) UpdateBudgetHandler(c echo.Context) error {
+// 	user, ok := c.Get("user").(models.User)
+// 	if !ok {
+// 		return common.SendInternalServerErrorResponse(c, "User authentication failed")
+// 	}
+
+// 	// create request type as IDParamRequest
+// 	// and bind the request body
+// 	budgetID := new(requests.IDParamRequest)
+// 	if err := (&echo.DefaultBinder{}).BindPathParams(c, budgetID.ID); err != nil {
+// 		return common.SendBadRequestResponse(c, "failed to bind id path param")
+// 	}
+
+// 	// retrieve the budget by id
+// 	budgetService := services.NewBudgetService(h.DB)
+// 	retrievedBudget, err := budgetService.GetBudgetById(budgetID.ID)
+// 	if err != nil {
+// 		if errors.Is(err, custom_errors.NewCustomError(err.Error())) {
+// 			return common.SendNotFoundResponse(c, err.Error())
+// 		}
+// 		return common.SendBadRequestResponse(c, err.Error())
+// 	}
+
+// 	// bind request body of type UpdateBudgetRequest
+// 	request := new(requests.UpdateBudgetRequest)
+// 	if err := h.BindRequestBody(c, request); err != nil {
+// 		return common.SendBadRequestResponse(c, "failed to bind budget request body")
+// 	}
+
+// 	// validation
+// 	validationErrors := h.ValidateRequestBody(c, request)
+// 	if validationErrors != nil {
+// 		return common.SendFailedValidationResponse(c, validationErrors)
+// 	}
+
+// 	budget, err := budgetService.UpdateBudget(retrievedBudget, request)
+// 	if err != nil {
+// 		return common.Send
+// 	}
+
+// 	return nil
+// }

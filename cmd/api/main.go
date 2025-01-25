@@ -63,6 +63,6 @@ func main() {
 	routes.Endpoints(app.server, app.handler, app.appMiddleware)
 
 	port := os.Getenv("SERVER_PORT")
-	addr := fmt.Sprintf("127.0.0.1:%s", port)
+	addr := fmt.Sprintf("localhost:%s", port)
 	e.Logger.Fatal(e.Start(addr))
 }
