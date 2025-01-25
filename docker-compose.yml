@@ -1,15 +1,42 @@
 services:
   db:
     image: postgres
-    container_name: budget_db_postgres
+    container_name: budget_db
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: budget
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - 5432:5432
+      - ${DB_PORT}:${DB_PORT}
     volumes:
       - budget_pg_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  web-app:
+    build: .
+    container_name: budgetapi_app
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=secret
+      - DB_NAME=budget
+    ports:
+      - 3000:3000
+    depends_on: db
+    networks:
+      - app_network
+    volumes:
+      - .:/app
+
+networks:
+  app_network:
+    driver: bridge
 
 volumes:
   budget_pg_data:
