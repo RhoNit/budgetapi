@@ -2,7 +2,6 @@
   <h1 style="font-family: cursive;">𝓑𝓾𝓭𝓰𝓮𝓽𝓐𝓟𝓘💰💳📊</h1>
 </div>
 
-
 ## Description
 BudgetAPI is a simple API that helps manage and track budgets for personal finance. It allows users to create, view, update, and delete budget entries and track expenses. Built using `golang`, `labstack/echo/v4`, `golang-jwt/jwt/v5`, `gomail.v2`, `gorm/Postgres`, `Docker`, `Terraform` etc
 
@@ -16,11 +15,11 @@ BudgetAPI is a simple API that helps manage and track budgets for personal finan
 - [x] Users can list out all the user-categories associations
 - [x] Users should be able to input their `budget` for each category of expenses, e.g. `Food 70.00 Ranit` 
 - [x] Users can view their budgets, update and delete a specific budget
-- [x] Users should be able to record expenses or income as a transaction
-- [x] Users should be able to see a detail page for their expenses for selected dates or month
-- [x] Users should get notified at the end of the day to provide their expenses input
-- [x] Users should be notified at the start of the month to prepare their expenses for the new month
-- [x] Users should be allowed to invite their others to their account 
+- [ ] Users should be able to record expenses or income as a transaction
+- [ ] Users should be able to see a detail page for their expenses for selected dates or month
+- [ ] Users should get notified at the end of the day to provide their expenses input
+- [ ] Users should be notified at the start of the month to prepare their expenses for the new month
+- [ ] Users should be allowed to invite their others to their account 
 
 ## Project Structure
 Project structure:
@@ -109,6 +108,10 @@ budgetapi/
   ├── go.sum
   └── README.md
 ```
+---
+## Architecture
+![BudgetAPI Logo](schematic_architecture.png "Architecture")
+---
 
 ## Project Setup & Configuration
 **1. Clone the project**
@@ -612,3 +615,31 @@ go run ./cmd/api/main.go        // or directly run the application
 ```
 ---
 
+## Infra Setup & Deployment
+### Database Deployment
+- [x] Created VPC stack along with provisioning subnet, igw, route table associations for Postgres container
+- [x] Then using Terraform script spinned up `postgres:14-alpine` image based container inside an EC2 instance provisioned in the above VPC stack
+---
+### Application Deployment
+= [x] Using the DB based EC2's public IP, setup the DB connection inside the application
+- [x] Created a docker image of application using the Dockerfile
+```bash
+docker build -t <app_img_name> .
+```
+- [ ] Tried to create a multi-stage docker image to reduce the image size.. but encountered some issues when a container was created using that image. Will try to devote some time on that in future.
+- [x] Tagged and pushed the docker image in AWS ECR repository
+```bash
+aws configure          # first configure with your aws creds then login to the Elasctic Container Registry
+aws ecr get-login-password --region <region_name> | docker login --username AWS --password-stdin <ecr_uri>
+docker tag <app_img_name>:<tag> <ecr_uri>/<ecr_repo>:<new_tag>
+docker push <ecr_uri>/<ecr_repo>:<new_tag>
+```
+- [x] Create another VPC stack like previous to provision the second EC2 machine where the application's container is gonna be hosted
+- [x] Used the ECR repo's image to spin up the application_container
+```bash
+docker run --name <application_container> \
+  -p <host_port>:<container_port> \
+  --restart unless-stopped
+  -d <ecr_uri>/<ecr_repo>:<new_tag>
+```
+---
