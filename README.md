@@ -1,20 +1,20 @@
-<div align="center" style="font-family: Arial, sans-serif; font-size: 48px; font-weight: bold; color: #007BFF; animation: glow 1.5s infinite;">
+<div align-item="center" style="font-family: 'Pacifico', cursive; font-size: 48px; color: #007BFF; animation: float 3s ease-in-out infinite;">
   BudgetAPI
 </div>
 
 <style>
-@keyframes glow {
-  0% {
-    text-shadow: 0 0 5px #007BFF, 0 0 10px #007BFF, 0 0 20px #007BFF;
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
   }
   50% {
-    text-shadow: 0 0 10px #00E6E6, 0 0 20px #00E6E6, 0 0 30px #00E6E6;
-  }
-  100% {
-    text-shadow: 0 0 5px #007BFF, 0 0 10px #007BFF, 0 0 20px #007BFF;
+    transform: translateY(-10px);
   }
 }
 </style>
+
 
 
 
@@ -31,11 +31,11 @@ BudgetAPI is a simple API that helps manage and track budgets for personal finan
 - [x] Users can list out all the user-categories associations
 - [x] Users should be able to input their `budget` for each category of expenses, e.g. `Food 70.00 Ranit` 
 - [x] Users can view their budgets, update and delete a specific budget
-- [] Users should be able to record expenses or income as a transaction
-- [] Users should be able to see a detail page for their expenses for selected dates or month
-- [] Users should get notified at the end of the day to provide their expenses input
-- [] Users should be notified at the start of the month to prepare their expenses for the new month
-- [] Users should be allowed to invite their others to their account 
+- [x] Users should be able to record expenses or income as a transaction
+- [x] Users should be able to see a detail page for their expenses for selected dates or month
+- [x] Users should get notified at the end of the day to provide their expenses input
+- [x] Users should be notified at the start of the month to prepare their expenses for the new month
+- [x] Users should be allowed to invite their others to their account 
 
 ## Project Structure
 Project structure:
