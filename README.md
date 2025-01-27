@@ -621,7 +621,7 @@ go run ./cmd/api/main.go        // or directly run the application
 - [x] Then using Terraform script spinned up `postgres:14-alpine` image based container inside an EC2 instance provisioned in the above VPC stack
 ---
 ### Application Deployment
-= [x] Using the DB based EC2's public IP, setup the DB connection inside the application
+- [x] Using the DB based EC2's public IP, setup the DB connection inside the application
 - [x] Created a docker image of application using the Dockerfile
 ```bash
 docker build -t <app_img_name> .
