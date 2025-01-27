@@ -1,21 +1,6 @@
-<div align-item="center" style="font-family: 'Pacifico', cursive; font-size: 48px; color: #007BFF; animation: float 3s ease-in-out infinite;">
-  BudgetAPI
+<div align="center">
+  <h1 style="font-family: cursive;">𝓑𝓾𝓭𝓰𝓮𝓽𝓐𝓟𝓘💰💳📊</h1>
 </div>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-</style>
-
-
 
 
 ## Description
