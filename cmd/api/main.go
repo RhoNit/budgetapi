@@ -62,7 +62,9 @@ func main() {
 
 	routes.Endpoints(app.server, app.handler, app.appMiddleware)
 
-	port := os.Getenv("SERVER_PORT")
-	addr := fmt.Sprintf("localhost:%s", port)
+	// serverHost := os.Getenv("SERVER_HOST")
+	serverPort := os.Getenv("SERVER_PORT")
+	// addr := fmt.Sprintf("%s:%s", serverHost, serverPort)
+	addr := fmt.Sprintf(":%s", serverPort)
 	e.Logger.Fatal(e.Start(addr))
 }

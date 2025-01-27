@@ -4,17 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func NewPostgres() (*gorm.DB, error) {
-	err := godotenv.Load()
-	if err != nil {
-		panic("error loading env variables")
-	}
-
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	database := os.Getenv("DB_NAME")
